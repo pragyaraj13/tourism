@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmation</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Booking Confirmed 🎉</h1>
+    <p>Thank you for booking! Here’s your QR pass:</p>
+    <div id="qrcode"></div>
+    <p>Show this QR at the venue.</p>
+  </div>
+
+  <script>
+    const qrDiv = document.getElementById("qrcode");
+    const bookingData = "TourismBooking-" + new Date().getTime();
+    new QRCode(qrDiv, {
+      text: bookingData,
+      width: 160,
+      height: 160
+    });
+  </script>
+</body>
+</html>

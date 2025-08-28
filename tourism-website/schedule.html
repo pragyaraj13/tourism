@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Schedule</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Your Schedule</h1>
+    <p>We generated a simple time slot schedule for your visit.</p>
+    <ul id="scheduleList"></ul>
+    <a href="confirm.html">
+      <button>Confirm & Get QR</button>
+    </a>
+  </div>
+
+  <script>
+    const places = new URLSearchParams(window.location.search).getAll('places');
+    const scheduleList = document.getElementById("scheduleList");
+    const slots = ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM"];
+
+    places.forEach((place, i) => {
+      const li = document.createElement("li");
+      li.textContent = `${slots[i % slots.length]} → ${place}`;
+      scheduleList.appendChild(li);
+    });
+  </script>
+</body>
+</html>

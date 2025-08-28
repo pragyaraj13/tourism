@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="bg-bg text-ink">
+  <header class="site-header">
+    <div class="container flex items-center justify-between">
+      <h1 class="logo">Admin Dashboard</h1>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container py-10">
+    <section class="card">
+      <div class="flex flex-wrap gap-3 items-end justify-between">
+        <h2 class="h2">Bookings</h2>
+        <div class="grid sm:grid-cols-3 gap-3 w-full sm:w-auto">
+          <select id="filterCity" class="input"></select>
+          <input id="filterDate" type="date" class="input"/>
+          <button id="clearFilters" class="btn-outline">Clear</button>
+        </div>
+      </div>
+
+      <div id="stats" class="stats mt-6"></div>
+
+      <div class="table mt-4">
+        <div class="table-head">
+          <div>ID</div><div>Name</div><div>Size</div><div>City</div><div>Date</div><div>Group</div><div>Attractions</div>
+        </div>
+        <div id="rows" class="table-body"></div>
+      </div>
+
+      <div class="mt-6 flex gap-3">
+        <button id="seedBtn" class="btn-accent">Add demo bookings</button>
+        <button id="clearBtn" class="btn-danger">Clear all</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    // populate city filter
+    const citySel = document.getElementById('filterCity');
+    const allOpt = document.createElement('option'); allOpt.value=''; allOpt.textContent='All cities'; citySel.appendChild(allOpt);
+    Object.keys(CITY_ATTRACTIONS).forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; citySel.appendChild(o); });
+
+    document.getElementById('filterDate').value = todayISO();
+
+    function render(){
+      const city = citySel.value;
+      const date = document.getElementById('filterDate').value;
+      const bookings = getBookings().filter(b => (!city || b.city===city) && (!date || b.date===date));
+
+      // stats
+      const loads = new Array(MAX_GROUPS).fill(0);
+      bookings.forEach(b => loads[b.groupIndex] += Number(b.size||0));
+      document.getElementById('stats').innerHTML = `
+        <div class="grid sm:grid-cols-5 gap-2">
+          ${loads.map((v,i)=>`<div class="stat"><div class="stat-title">Group ${i+1}</div><div class="stat-value">${v}/100</div></div>`).join('')}
+        </div>`;
+
+      // rows
+      const rows = document.getElementById('rows'); rows.innerHTML='';
+      bookings.forEach(b => {
+        const row = document.createElement('div'); row.className='table-row';
+        row.innerHTML = `
+          <div>${b.id}</div>
+          <div>${escapeHtml(b.name)}</div>
+          <div>${b.size}</div>
+          <div>${b.city}</div>
+          <div>${b.date}</div>
+          <div>${b.groupIndex+1}</div>
+          <div>${b.attractions.join(', ')}</div>`;
+        rows.appendChild(row);
+      });
+    }
+
+    document.getElementById('seedBtn').addEventListener('click', () => { seedDemoBookings(); render(); });
+    document.getElementById('clearBtn').addEventListener('click', () => { localStorage.removeItem('bookings'); render(); });
+    document.getElementById('clearFilters').addEventListener('click', () => { citySel.value=''; document.getElementById('filterDate').value=todayISO(); render(); });
+    citySel.addEventListener('change', render);
+    document.getElementById('filterDate').addEventListener('change', render);
+
+    render();
+  </script>
+</body>
+</html>
